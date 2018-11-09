@@ -59,7 +59,7 @@ DomoSchema.statics.delete = (ownerId, domoName, callback) => {
     owner: convertID(ownerId),
     name: domoName,
   };
-    
+
   return DomoModel.deleteOne(search).exec(callback);
 };
 

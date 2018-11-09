@@ -1,17 +1,17 @@
 "use strict";
 
-var handleDomo = function handleDomo(e) {
+var handleTask = function handleTask(e) {
     e.preventDefault();
 
     $("#domoMessage").animate({ width: 'hide' }, 350);
 
-    if ($("#domoName").val() == '' || $("#domoAge").val() == '' || $("#domoNotes").val() == '') {
+    if ($("#taskName").val() == '' || $("#taskDesc").val() == '' || $("#taskDueDate").val() == '') {
         handleError("RAWR! All fields are required");
         return false;
     }
 
-    sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function () {
-        loadDomosFromServer();
+    sendAjax('POST', $("#taskForm").attr("action"), $("#taskForm").serialize(), function () {
+        loadTasksFromServer();
     });
 
     return false;
@@ -26,36 +26,36 @@ var handleDelete = function handleDelete(e) {
     }
 
     sendAjax('DELETE', $("#deleteForm").attr("action"), $("#deleteForm").serialize(), function () {
-        loadDomosFromServer();
+        loadTasksFromServer();
     });
 
     return false;
 };
 
-var DomoForm = function DomoForm(props) {
+var TaskForm = function TaskForm(props) {
     return React.createElement(
         "form",
-        { id: "domoForm", onSubmit: handleDomo, name: "domoForm", action: "/maker", method: "POST", className: "domoForm" },
+        { id: "taskForm", onSubmit: handleTask, name: "taskForm", action: "/maker", method: "POST", className: "taskForm" },
         React.createElement(
             "label",
             { htmlFor: "name" },
             "Name: "
         ),
-        React.createElement("input", { id: "domoName", type: "text", name: "name", placeholder: "Domo Name" }),
+        React.createElement("input", { id: "taskName", type: "text", name: "name", placeholder: "Task Name" }),
         React.createElement(
             "label",
-            { htmlFor: "age" },
-            "Age: "
+            { htmlFor: "description" },
+            "Description: "
         ),
-        React.createElement("input", { id: "domoAge", type: "text", name: "age", placeholder: "Domo Age" }),
+        React.createElement("input", { id: "taskDesc", type: "text", name: "description", placeholder: "Task Description" }),
         React.createElement(
             "label",
-            { htmlFor: "notes" },
-            "Notes: "
+            { htmlFor: "dueDate" },
+            "Due Date: "
         ),
-        React.createElement("input", { id: "domoNotes", type: "text", name: "notes", placeholder: "Domo Notes" }),
+        React.createElement("input", { id: "taskDueDate", type: "date", name: "dueDate", placeholder: "Task Due Date" }),
         React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
-        React.createElement("input", { className: "makeDomoSubmit", type: "submit", value: "Make Domo" })
+        React.createElement("input", { className: "makeTaskSubmit", type: "submit", value: "Make Task" })
     );
 };
 
@@ -68,75 +68,79 @@ var DeleteForm = function DeleteForm(props) {
             { htmlFor: "name" },
             "Name: "
         ),
-        React.createElement("input", { id: "deleteName", type: "text", name: "deleteName", placeholder: "Domo Name" }),
+        React.createElement("input", { id: "deleteName", type: "text", name: "deleteName", placeholder: "Task Name" }),
         React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
-        React.createElement("input", { className: "deleteDomoSubmit", type: "submit", value: "Delete Domo" })
+        React.createElement("input", { className: "deleteTaskSubmit", type: "submit", value: "Delete Task" })
     );
 };
 
-var DomoList = function DomoList(props) {
-    if (props.domos.length === 0) {
+var TaskList = function TaskList(props) {
+    if (props.tasks.length === 0) {
         return React.createElement(
             "div",
-            { className: "domoList" },
+            { className: "taskList" },
             React.createElement(
                 "h3",
-                { className: "emptyDomo" },
-                "No Domos yet"
+                { className: "emptyTask" },
+                "No Tasks yet"
             )
         );
     }
 
-    var domoNodes = props.domos.map(function (domo, csrf) {
+    console.log(props.tasks);
+
+    var taskNodes = props.tasks.map(function (task) {
+
         return React.createElement(
             "div",
-            { key: domo._id, className: "domo" },
+            { key: task._id, className: "task" },
             React.createElement("img", { src: "/assets/img/domoface.jpeg", alt: "domo face", className: "domoFace" }),
             React.createElement(
                 "h3",
-                { className: "domoName" },
+                { className: "taskName" },
                 "Name: ",
-                domo.name,
+                task.name,
                 " "
             ),
             React.createElement(
                 "h3",
-                { className: "domoAge" },
-                "Age: ",
-                domo.age,
+                { className: "taskDesc" },
+                "Description: ",
+                task.description,
                 " "
             ),
             React.createElement(
                 "h3",
-                { className: "domoNotes" },
-                "Notes: ",
-                domo.notes,
+                { className: "taskDueDate" },
+                "Due Date: ",
+                task.dueDate,
                 " "
-            )
+            ),
+            React.createElement("input", { type: "hidden", name: "taskOverdue", value: task.overdue })
         );
     });
 
     return React.createElement(
         "div",
-        { className: "domoList" },
-        domoNodes
+        { className: "taskList" },
+        taskNodes
     );
 };
 
-var loadDomosFromServer = function loadDomosFromServer() {
-    sendAjax('GET', '/getDomos', null, function (data) {
-        ReactDOM.render(React.createElement(DomoList, { domos: data.domos }), document.querySelector("#domos"));
+var loadTasksFromServer = function loadTasksFromServer() {
+    sendAjax('GET', '/getTasks', null, function (data) {
+        ReactDOM.render(React.createElement(TaskList, { tasks: data.tasks }), document.querySelector("#tasks"));
     });
 };
 
 var setup = function setup(csrf) {
-    ReactDOM.render(React.createElement(DomoForm, { csrf: csrf }), document.querySelector("#makeDomo"));
+    ReactDOM.render(React.createElement(TaskForm, { csrf: csrf }), document.querySelector("#makeTask"));
 
-    ReactDOM.render(React.createElement(DeleteForm, { csrf: csrf }), document.querySelector("#deleteDomo"));
+    ReactDOM.render(React.createElement(DeleteForm, { csrf: csrf }), document.querySelector("#deleteTask"));
 
-    ReactDOM.render(React.createElement(DomoList, { domos: [] }), document.querySelector("#domos"));
+    ReactDOM.render(React.createElement(TaskList, { tasks: [] }), document.querySelector("#tasks"));
 
-    loadDomosFromServer();
+    loadTasksFromServer();
 };
 
 var getToken = function getToken() {

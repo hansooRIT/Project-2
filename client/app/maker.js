@@ -1,15 +1,15 @@
-const handleDomo = (e) => {
+const handleTask = (e) => {
     e.preventDefault();
     
     $("#domoMessage").animate({width:'hide'}, 350);
     
-    if ($("#domoName").val() == '' || $("#domoAge").val() == '' || $("#domoNotes").val() == '') {
+    if ($("#taskName").val() == '' || $("#taskDesc").val() == '' || $("#taskDueDate").val() == '') {
         handleError("RAWR! All fields are required");
         return false;
     }
     
-    sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function() {
-        loadDomosFromServer();
+    sendAjax('POST', $("#taskForm").attr("action"), $("#taskForm").serialize(), function() {
+        loadTasksFromServer();
     });
     
     return false;
@@ -24,23 +24,23 @@ const handleDelete = (e) => {
     }
     
     sendAjax('DELETE', $("#deleteForm").attr("action"), $("#deleteForm").serialize(), function() {
-        loadDomosFromServer();
+        loadTasksFromServer();
     });
     
     return false;
 }
 
-const DomoForm = (props) => {
+const TaskForm = (props) => {
     return (
-        <form id="domoForm" onSubmit={handleDomo} name="domoForm" action="/maker" method="POST" className="domoForm">
+        <form id="taskForm" onSubmit={handleTask} name="taskForm" action="/maker" method="POST" className="taskForm">
             <label htmlFor="name">Name: </label>
-            <input id="domoName" type="text" name="name" placeholder="Domo Name"/>
-            <label htmlFor="age">Age: </label>
-            <input id="domoAge" type="text" name="age" placeholder="Domo Age"/>
-            <label htmlFor="notes">Notes: </label>
-            <input id="domoNotes" type="text" name="notes" placeholder="Domo Notes"/>
+            <input id="taskName" type="text" name="name" placeholder="Task Name"/>
+            <label htmlFor="description">Description: </label>
+            <input id="taskDesc" type="text" name="description" placeholder="Task Description"/>
+            <label htmlFor="dueDate">Due Date: </label>
+            <input id="taskDueDate" type="date" name="dueDate" placeholder="Task Due Date"/>
             <input type="hidden" name="_csrf" value={props.csrf}/>
-            <input className="makeDomoSubmit" type="submit" value="Make Domo"/>
+            <input className="makeTaskSubmit" type="submit" value="Make Task"/>
         </form>
     );
 };
@@ -50,62 +50,66 @@ const DeleteForm = (props) => {
     return (
         <form id="deleteForm" onSubmit={handleDelete} name="deleteForm" action="/delete" method="DELETE" className="deleteForm">
             <label htmlFor="name">Name: </label>
-            <input id="deleteName" type="text" name="deleteName" placeholder="Domo Name"/>
+            <input id="deleteName" type="text" name="deleteName" placeholder="Task Name"/>
             <input type="hidden" name="_csrf" value={props.csrf}/>
-            <input className="deleteDomoSubmit" type="submit" value="Delete Domo"/>
+            <input className="deleteTaskSubmit" type="submit" value="Delete Task"/>
         </form>
     );
 };
 
-const DomoList = (props) => {
-    if (props.domos.length === 0) {
+const TaskList = (props) => {
+    if (props.tasks.length === 0) {
         return (
-            <div className="domoList">
-                <h3 className="emptyDomo">No Domos yet</h3>
+            <div className="taskList">
+                <h3 className="emptyTask">No Tasks yet</h3>
             </div>
         );
     }
     
-    const domoNodes = props.domos.map(function(domo, csrf) {
+    console.log(props.tasks);
+    
+    const taskNodes = props.tasks.map(function(task) {
+        
         return (
-            <div key={domo._id} className="domo">
+            <div key={task._id} className="task">
                 <img src="/assets/img/domoface.jpeg" alt="domo face" className="domoFace"/>
-                <h3 className="domoName">Name: {domo.name} </h3>
-                <h3 className="domoAge">Age: {domo.age} </h3>
-                <h3 className="domoNotes">Notes: {domo.notes} </h3>
+                <h3 className="taskName">Name: {task.name} </h3>
+                <h3 className="taskDesc">Description: {task.description} </h3>
+                <h3 className="taskDueDate">Due Date: {task.dueDate} </h3>
+                <input type="hidden" name="taskOverdue" value={task.overdue}/>
             </div>
         );
     });
     
     return (
-        <div className="domoList">
-            {domoNodes}
+        <div className="taskList">
+            {taskNodes}
         </div>
     );
 };
 
-const loadDomosFromServer = () => {
-    sendAjax('GET', '/getDomos', null, (data) => {
+const loadTasksFromServer = () => {
+    sendAjax('GET', '/getTasks', null, (data) => {
         ReactDOM.render(
-            <DomoList domos={data.domos} />, document.querySelector("#domos")
+            <TaskList tasks={data.tasks} />, document.querySelector("#tasks")
         );
     });
 };
 
 const setup = (csrf) => {
     ReactDOM.render(
-        <DomoForm csrf={csrf}/>, document.querySelector("#makeDomo")
+        <TaskForm csrf={csrf}/>, document.querySelector("#makeTask")
     );
     
     ReactDOM.render(
-        <DeleteForm csrf={csrf}/>, document.querySelector("#deleteDomo")
+        <DeleteForm csrf={csrf}/>, document.querySelector("#deleteTask")
     );
     
     ReactDOM.render(
-        <DomoList domos={[]}/>, document.querySelector("#domos")
+        <TaskList tasks={[]}/>, document.querySelector("#tasks")
     );
     
-    loadDomosFromServer();
+    loadTasksFromServer();
 };
 
 const getToken = () => {
