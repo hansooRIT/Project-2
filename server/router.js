@@ -10,6 +10,8 @@ const router = (app) => {
   app.get('/logout', mid.requiresLogin, controllers.Account.logout);
   app.get('/maker', mid.requiresLogin, controllers.Task.makerPage);
   app.post('/maker', mid.requiresLogin, controllers.Task.make);
+  app.get('/passwordChange', mid.requiresLogin, controllers.Account.passwordChangePage);
+  app.post('/passwordChange', mid.requiresLogin, controllers.Account.passwordChange);
   app.delete('/delete', mid.requiresLogin, controllers.Task.deleteTask);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
 };

@@ -82,6 +82,28 @@ AccountModel.findByUsername(username, (err, doc) => {
   });
 });
 
+AccountSchema.statics.changePassword = (username, oldPass, newPass, callback) =>
+    AccountModel.findByUsername(username, (err, doc) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (!doc) {
+            return callback();
+        }
+    
+        return validatePassword(doc, oldPass, (result) => {
+            if (result === true) {
+                doc.set({ password: newPass});
+                doc.save((err, doc) => {
+                    if (err) return callback(err);
+                    res.send(doc);
+                });
+            }
+            return callback();
+        });
+    });
+
 AccountModel = mongoose.model('Account', AccountSchema);
 
 module.exports.AccountModel = AccountModel;
