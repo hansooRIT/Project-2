@@ -12,8 +12,6 @@ var handlePasswordChange = function handlePasswordChange(e) {
         return false;
     }
     sendAjax('POST', $("#passwordChangeForm").attr("action"), $("#passwordChangeForm").serialize(), redirect);
-    alert("Password has been changed!");
-
     return false;
 };
 
@@ -29,7 +27,6 @@ var handlePremiumUser = function handlePremiumUser(e) {
         return false;
     }
     sendAjax('POST', $("#premiumUserForm").attr("action"), $("#premiumUserForm").serialize(), redirect);
-    alert("Account has been set to premium!");
     return false;
 };
 

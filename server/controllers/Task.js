@@ -2,7 +2,8 @@ const models = require('../models');
 
 const Task = models.Task;
 
-//Method to render the main app page. First needs to find all tasks that belong to the user and return that as well to render.
+// Method to render the main app page. First needs to
+// find all tasks that belong to the user and return that as well to render.
 const makerPage = (req, res) => {
   Task.TaskModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
@@ -13,7 +14,8 @@ const makerPage = (req, res) => {
   });
 };
 
-//Method to create a task. Creates a json object of the provided data, then saves that to the database.
+// Method to create a task. Creates a json object
+// of the provided data, then saves that to the database.
 const makeTask = (req, res) => {
   if (!req.body.name) {
     return res.status(400).json({ error: 'RAWN! Name is required!' });
@@ -43,8 +45,9 @@ const makeTask = (req, res) => {
   return taskPromise;
 };
 
-//Method to retrieve the account's tasks.
-//Calls method in TaskModel to find all tasks that belong to this account, then return it as a json object.
+// Method to retrieve the account's tasks.
+// Calls method in TaskModel to find all
+// tasks that belong to this account, then return it as a json object.
 const getTasks = (request, response) => {
   const req = request;
   const res = response;
@@ -59,8 +62,8 @@ const getTasks = (request, response) => {
   });
 };
 
-//Method to retrieve the account's tasks that are marked as current.
-//Returns a json object of all current tasks.
+// Method to retrieve the account's tasks that are marked as current.
+// Returns a json object of all current tasks.
 const getCurrentTasks = (request, response) => {
   const req = request;
   const res = response;
@@ -75,8 +78,8 @@ const getCurrentTasks = (request, response) => {
   });
 };
 
-//Method to retrieve the account's tasks that are marked as completed.
-//Returns a json object of all completed tasks.
+// Method to retrieve the account's tasks that are marked as completed.
+// Returns a json object of all completed tasks.
 const getCompletedTasks = (request, response) => {
   const req = request;
   const res = response;
@@ -91,12 +94,12 @@ const getCompletedTasks = (request, response) => {
   });
 };
 
-//Method to retrieve another account's tasklist..
-//Returns a json object of all of the other user's tasks.
+// Method to retrieve another account's tasklist..
+// Returns a json object of all of the other user's tasks.
 const getFriendTasks = (request, response) => {
   const req = request;
   const res = response;
-    
+
   return Task.TaskModel.findByOwner(req.query._id, (err, docs) => {
     if (err) {
       console.log(err);
@@ -105,14 +108,14 @@ const getFriendTasks = (request, response) => {
 
     return res.json({ tasks: docs });
   });
-}
+};
 
-//Method to delete a task.
-//Sends data regarding the task to the model, and the model removes that task from the database.
+// Method to delete a task.
+// Sends data regarding the task to the model, and the model removes that task from the database.
 const deleteNode = (request, response) => {
   const req = request;
   const res = response;
-  
+
   return Task.TaskModel.deleteNode(req.body._id, (err) => {
     if (err) {
       return res.status(400).json({ error: 'An error occurred' });
@@ -121,17 +124,17 @@ const deleteNode = (request, response) => {
   });
 };
 
-//Method to set a task as complete.
-//Retrieves the specified database entry and sets its completion to true.
+// Method to set a task as complete.
+// Retrieves the specified database entry and sets its completion to true.
 const completeNode = (request, response) => {
   const req = request;
-  const res = response; 
+  const res = response;
 
   return Task.TaskModel.markAsDone(req.body._id, (err) => {
     if (err) {
       return res.status(400).json({ error: 'An error occurred' });
     }
-    return res.json({ message: 'Task Completed' });
+    return res.json({ redirect: '/maker' });
   });
 };
 

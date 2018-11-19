@@ -26,16 +26,16 @@ const AccountSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-    
+
   isPremium: {
     type: Boolean,
     default: false,
   },
-    
+
   email: {
     type: String,
   },
-    
+
   createdDate: {
     type: Date,
     default: Date.now,
@@ -73,7 +73,7 @@ AccountSchema.statics.findByID = (id, callback) => {
   const search = {
     _id: convertID(id),
   };
-    
+
   return AccountModel.findOne(search, callback);
 };
 
@@ -104,59 +104,61 @@ AccountModel.findByUsername(username, (err, doc) => {
   });
 });
 
-//Change passwords method.
-//Find the account, then validate that they entered the correct old password, then hash the new password and set that value to the password field in the database entry.
+// Change passwords method.
+// Find the account, then validate that they entered
+// the correct old password, then hash the new password
+// and set that value to the password field in the database entry.
 AccountSchema.statics.changePassword = (username, oldPass, newPass, callback) =>
     AccountModel.findByUsername(username, (err, doc) => {
-        if (err) {
-            return callback(err);
-        }
+      if (err) {
+        return callback(err);
+      }
 
-        if (!doc) {
-            return callback();
+      if (!doc) {
+        return callback();
+      }
+
+      return validatePassword(doc, oldPass, (result) => {
+        if (result === true) {
+          let hashedPass = '';
+          return crypto.pbkdf2(newPass, doc.salt, iterations,
+          keyLength, 'RSA-SHA512', (erro, hash) => {
+            hashedPass = hash.toString('hex');
+            doc.set({ password: hashedPass });
+            return doc.save((error, document) => {
+              if (error) {
+                return callback(error);
+              }
+              return callback(null, document);
+            });
+          });
         }
-    
-        return validatePassword(doc, oldPass, (result) => {
-            if (result === true) {
-                let hashedPass = "";
-                crypto.pbkdf2(newPass, doc.salt, iterations, keyLength, 'RSA-SHA512', (err, hash) => {
-                    hashedPass = hash.toString('hex');
-                    doc.set({ password: hashedPass});
-                    doc.save((err, doc) => {
-                        if (err) {
-                            return callback(err);
-                        }
-                        return callback(null, doc);
-                    });
-                });
-                return callback(null, doc);
-            }
-            return callback();
-        });
+        return callback();
+      });
     });
 
-//Method to set an email and premium status to an account.
-//Finds the account by id, then adds the appropriate fields.
+// Method to set an email and premium status to an account.
+// Finds the account by id, then adds the appropriate fields.
 AccountSchema.statics.setPremium = (id, email, callback) =>
     AccountModel.findByID(id, (err, doc) => {
-        if (err) {
-            return callback(err);
-        }
+      if (err) {
+        return callback(err);
+      }
 
-        if (!doc) {
-            return callback();
+      if (!doc) {
+        return callback();
+      }
+
+      doc.set({
+        email,
+        isPremium: true,
+      });
+      return doc.save((error, document) => {
+        if (error) {
+          return callback(error);
         }
-    
-        doc.set({
-            email: email,
-            isPremium: true,
-        });
-        doc.save((err, doc) => {
-            if (err) {
-                return callback(err);
-            }
-            return callback(null, doc);
-        });
+        return callback(null, document);
+      });
     });
 
 AccountModel = mongoose.model('Account', AccountSchema);

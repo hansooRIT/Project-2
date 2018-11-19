@@ -67,19 +67,19 @@ TaskSchema.statics.findCompleteByOwner = (ownerId, callback) => {
     owner: convertID(ownerId),
     isComplete: true,
   };
-    
+
   return TaskModel.find(search).select('name description isComplete').exec(callback);
 };
 
 TaskSchema.statics.findById = (id, callback) => {
-    const search = {
-        _id: convertID(id),
-    };
-    
-    return TaskModel.findOne(search, callback);
+  const search = {
+    _id: convertID(id),
+  };
+
+  return TaskModel.findOne(search, callback);
 };
 
-//Simple deletion method for nodes by _id.
+// Simple deletion method for nodes by _id.
 TaskSchema.statics.deleteNode = (ownerId, callback) => {
   const search = {
     _id: convertID(ownerId),
@@ -88,24 +88,24 @@ TaskSchema.statics.deleteNode = (ownerId, callback) => {
   return TaskModel.deleteOne(search).exec(callback);
 };
 
-//Finds task by id, then sets their status to complete.
+// Finds task by id, then sets their status to complete.
 TaskSchema.statics.markAsDone = (id, callback) => {
-    TaskModel.findById(id, (err, doc) => {
-        if (err) {
-            return callback(err);
-        }
+  TaskModel.findById(id, (err, doc) => {
+    if (err) {
+      return callback(err);
+    }
 
-        if (!doc) {
-            return callback();
-        }
-        doc.set({isComplete: true});
-        doc.save((err, doc) => {
-            if (err) {
-                return callback(err);
-            }
-            return callback(null, doc);
-        });
+    if (!doc) {
+      return callback();
+    }
+    doc.set({ isComplete: true });
+    return doc.save((error, document) => {
+      if (error) {
+        return callback(error);
+      }
+      return callback(null, document);
     });
+  });
 };
 
 TaskModel = mongoose.model('Task', TaskSchema);

@@ -7,7 +7,7 @@ const logout = (req, res) => {
   res.redirect('/');
 };
 
-//set of 3 functions for rendering the handlebars pages with the csrf token.
+// set of 3 functions for rendering the handlebars pages with the csrf token.
 const loginPage = (req, res) => {
   res.render('login', { csrfToken: req.csrfToken() });
 };
@@ -20,7 +20,7 @@ const friendTasksPage = (req, res) => {
   res.render('friendTasks', { csrfToken: req.csrfToken() });
 };
 
-//Login method to access the app. Redirects to main app page on success.
+// Login method to access the app. Redirects to main app page on success.
 const login = (request, response) => {
   const req = request;
   const res = response;
@@ -43,8 +43,8 @@ const login = (request, response) => {
   });
 };
 
-//Method to create an account.
-//Has to make sure to encrypt the password that the user provides for safety.
+// Method to create an account.
+// Has to make sure to encrypt the password that the user provides for safety.
 const signup = (request, response) => {
   const req = request;
   const res = response;
@@ -89,73 +89,75 @@ const signup = (request, response) => {
   });
 };
 
-//Method to change an account's password.
-//Checks if the provided parameters are valid, then sends to model to set the new password.
+// Method to change an account's password.
+// Checks if the provided parameters are valid, then sends to model to set the new password.
 const passwordChange = (request, response) => {
-    const req = request;
-    const res = response;
-    
-    req.body.username = `${req.body.username}`;
-    req.body.oldPass = `${req.body.oldPass}`;
-    req.body.pass1 = `${req.body.pass1}`;
-    req.body.pass2 = `${req.body.pass2}`;
-    
-    if (!req.body.username || !req.body.oldPass || !req.body.pass1 || !req.body.pass2) {
-        return res.status(400).json({ error: 'RAWR! All fields are required!' });
-    }
+  const req = request;
+  const res = response;
 
-    if (req.body.pass1 !== req.body.pass2) {
-        return res.status(400).json({ error: 'RAWR! Passwords do not match!' });
-    }
-    
-    const username = `${req.body.username}`;
-    const oldPass = `${req.body.oldPass}`;
-    const newPass = `${req.body.pass1}`;
-    
-    return Account.AccountModel.changePassword(username, oldPass, newPass, (err, account) => {
-        if (err || !account) {
-          return res.status(401).json({ error: 'Wrong username or password' });
-        }
-    });
-}
+  req.body.username = `${req.body.username}`;
+  req.body.oldPass = `${req.body.oldPass}`;
+  req.body.pass1 = `${req.body.pass1}`;
+  req.body.pass2 = `${req.body.pass2}`;
 
-//Method to find another person's task list.
-//Provides username, then sends to account model to return listing.
+  if (!req.body.username || !req.body.oldPass || !req.body.pass1 || !req.body.pass2) {
+    return res.status(400).json({ error: 'RAWR! All fields are required!' });
+  }
+
+  if (req.body.pass1 !== req.body.pass2) {
+    return res.status(400).json({ error: 'RAWR! Passwords do not match!' });
+  }
+
+  const username = `${req.body.username}`;
+  const oldPass = `${req.body.oldPass}`;
+  const newPass = `${req.body.pass1}`;
+
+  return Account.AccountModel.changePassword(username, oldPass, newPass, (err, account) => {
+    if (err || !account) {
+      return res.status(401).json({ error: 'Wrong username or password' });
+    }
+    return res.json({ redirect: '/accountSettings' });
+  });
+};
+
+// Method to find another person's task list.
+// Provides username, then sends to account model to return listing.
 const friendSearch = (request, response) => {
-    const req = request;
-    const res = response;
-  
-    req.body.friendSearchName = `${req.body.friendSearchName}`;
-    
-    if (!req.body.friendSearchName) {
-        return res.status(400).json({ error: 'RAWR! Enter an account name!'});
-    }
-    
-    return Account.AccountModel.findByUsername(req.body.friendSearchName, (err, doc) => {
-        if (err || !doc) {
-            return res.status(401).json({ error: 'Invalid username!' });
-        }
-        return res.json({user: doc});
-    });
-}
+  const req = request;
+  const res = response;
 
-//Method to set an account to premium and adds an email to their account.
-const setPremium = (request, response) => {
-    const req = request;
-    const res = response;
-    
-    req.body.email = `${req.body.email}`;
-    
-    if (!req.body.email) {
-        return res.status(400).json({ error: 'RAWR! Enter an email to link to a premium account!'});
+  req.body.friendSearchName = `${req.body.friendSearchName}`;
+
+  if (!req.body.friendSearchName) {
+    return res.status(400).json({ error: 'RAWR! Enter an account name!' });
+  }
+
+  return Account.AccountModel.findByUsername(req.body.friendSearchName, (err, doc) => {
+    if (err || !doc) {
+      return res.status(401).json({ error: 'Invalid username!' });
     }
-    
-    return Account.AccountModel.setPremium(req.session.account._id, req.body.email, (err, doc) => {
-        if (err || !doc) {
-            return res.status(401).json({ error: 'Something went wrong!' });
-        }
-    })
-}
+    return res.json({ user: doc });
+  });
+};
+
+// Method to set an account to premium and adds an email to their account.
+const setPremium = (request, response) => {
+  const req = request;
+  const res = response;
+
+  req.body.email = `${req.body.email}`;
+
+  if (!req.body.email) {
+    return res.status(400).json({ error: 'RAWR! Enter an email to link to a premium account!' });
+  }
+
+  return Account.AccountModel.setPremium(req.session.account._id, req.body.email, (err, doc) => {
+    if (err || !doc) {
+      return res.status(401).json({ error: 'Something went wrong!' });
+    }
+    return res.json({ redirect: '/accountSettings' });
+  });
+};
 
 const getToken = (request, response) => {
   const req = request;
