@@ -8,6 +8,8 @@ const iterations = 10000;
 const saltLength = 64;
 const keyLength = 64;
 
+const convertID = mongoose.Types.ObjectId;
+
 const AccountSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -24,6 +26,16 @@ const AccountSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+    
+  isPremium: {
+    type: Boolean,
+    default: false,
+  },
+    
+  email: {
+    type: String,
+  },
+    
   createdDate: {
     type: Date,
     default: Date.now,
@@ -34,6 +46,8 @@ AccountSchema.statics.toAPI = doc => ({
   // _id is built into your mongo document and is guaranteed to be unique
   username: doc.username,
   _id: doc._id,
+  isPremium: doc.isPremium,
+  email: doc.email,
 });
 
 const validatePassword = (doc, password, callback) => {
@@ -52,6 +66,14 @@ AccountSchema.statics.findByUsername = (name, callback) => {
     username: name,
   };
 
+  return AccountModel.findOne(search, callback);
+};
+
+AccountSchema.statics.findByID = (id, callback) => {
+  const search = {
+    _id: convertID(id),
+  };
+    
   return AccountModel.findOne(search, callback);
 };
 
@@ -82,6 +104,8 @@ AccountModel.findByUsername(username, (err, doc) => {
   });
 });
 
+//Change passwords method.
+//Find the account, then validate that they entered the correct old password, then hash the new password and set that value to the password field in the database entry.
 AccountSchema.statics.changePassword = (username, oldPass, newPass, callback) =>
     AccountModel.findByUsername(username, (err, doc) => {
         if (err) {
@@ -94,13 +118,44 @@ AccountSchema.statics.changePassword = (username, oldPass, newPass, callback) =>
     
         return validatePassword(doc, oldPass, (result) => {
             if (result === true) {
-                doc.set({ password: newPass});
-                doc.save((err, doc) => {
-                    if (err) return callback(err);
-                    res.send(doc);
+                let hashedPass = "";
+                crypto.pbkdf2(newPass, doc.salt, iterations, keyLength, 'RSA-SHA512', (err, hash) => {
+                    hashedPass = hash.toString('hex');
+                    doc.set({ password: hashedPass});
+                    doc.save((err, doc) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        return callback(null, doc);
+                    });
                 });
+                return callback(null, doc);
             }
             return callback();
+        });
+    });
+
+//Method to set an email and premium status to an account.
+//Finds the account by id, then adds the appropriate fields.
+AccountSchema.statics.setPremium = (id, email, callback) =>
+    AccountModel.findByID(id, (err, doc) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (!doc) {
+            return callback();
+        }
+    
+        doc.set({
+            email: email,
+            isPremium: true,
+        });
+        doc.save((err, doc) => {
+            if (err) {
+                return callback(err);
+            }
+            return callback(null, doc);
         });
     });
 

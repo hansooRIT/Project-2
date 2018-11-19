@@ -21,12 +21,7 @@ const TaskSchema = new mongoose.Schema({
     trim: true,
   },
 
-  dueDate: {
-    type: Date,
-    required: true,
-  },
-
-  overdue: {
+  isComplete: {
     type: Boolean,
     default: false,
   },
@@ -46,8 +41,7 @@ const TaskSchema = new mongoose.Schema({
 TaskSchema.statics.toAPI = (doc) => ({
   name: doc.name,
   description: doc.description,
-  dueDate: doc.dueDate,
-  overdue: doc.overdue,
+  isComplete: doc.isComplete,
   _id: doc._id,
 });
 
@@ -56,16 +50,62 @@ TaskSchema.statics.findByOwner = (ownerId, callback) => {
     owner: convertID(ownerId),
   };
 
-  return TaskModel.find(search).select('name description dueDate overdue').exec(callback);
+  return TaskModel.find(search).select('name description isComplete').exec(callback);
 };
 
-TaskSchema.statics.delete = (ownerId, taskName, callback) => {
+TaskSchema.statics.findCurrentByOwner = (ownerId, callback) => {
   const search = {
     owner: convertID(ownerId),
-    name: taskName,
+    isComplete: false,
+  };
+
+  return TaskModel.find(search).select('name description isComplete').exec(callback);
+};
+
+TaskSchema.statics.findCompleteByOwner = (ownerId, callback) => {
+  const search = {
+    owner: convertID(ownerId),
+    isComplete: true,
+  };
+    
+  return TaskModel.find(search).select('name description isComplete').exec(callback);
+};
+
+TaskSchema.statics.findById = (id, callback) => {
+    const search = {
+        _id: convertID(id),
+    };
+    
+    return TaskModel.findOne(search, callback);
+};
+
+//Simple deletion method for nodes by _id.
+TaskSchema.statics.deleteNode = (ownerId, callback) => {
+  const search = {
+    _id: convertID(ownerId),
   };
 
   return TaskModel.deleteOne(search).exec(callback);
+};
+
+//Finds task by id, then sets their status to complete.
+TaskSchema.statics.markAsDone = (id, callback) => {
+    TaskModel.findById(id, (err, doc) => {
+        if (err) {
+            return callback(err);
+        }
+
+        if (!doc) {
+            return callback();
+        }
+        doc.set({isComplete: true});
+        doc.save((err, doc) => {
+            if (err) {
+                return callback(err);
+            }
+            return callback(null, doc);
+        });
+    });
 };
 
 TaskModel = mongoose.model('Task', TaskSchema);

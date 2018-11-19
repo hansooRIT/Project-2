@@ -17,7 +17,7 @@ const dbURL = process.env.MONGODB_URI || 'mongodb://localhost/DomoMaker';
 
 mongoose.connect(dbURL, (err) => {
   if (err) {
-    console.log('Could not connecto to database');
+    console.log('Could not connect to database');
     throw err;
   }
 });
@@ -39,7 +39,7 @@ const router = require('./router.js');
 const app = express();
 
 app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
-app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
+app.use(favicon(`${__dirname}/../hosted/img/complete_symbol.jpg`));
 app.disable('x-powered-by');
 app.use(compression());
 app.use(bodyParser.urlencoded({

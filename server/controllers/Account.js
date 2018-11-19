@@ -2,19 +2,25 @@ const models = require('../models');
 
 const Account = models.Account;
 
-const loginPage = (req, res) => {
-  res.render('login', { csrfToken: req.csrfToken() });
-};
-
 const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/');
 };
 
-const passwordChangePage = (req, res) => {
-  res.render('passwordChange', { csrfToken: req.csrfToken() });
+//set of 3 functions for rendering the handlebars pages with the csrf token.
+const loginPage = (req, res) => {
+  res.render('login', { csrfToken: req.csrfToken() });
 };
 
+const accountSettingsPage = (req, res) => {
+  res.render('accountSettings', { csrfToken: req.csrfToken() });
+};
+
+const friendTasksPage = (req, res) => {
+  res.render('friendTasks', { csrfToken: req.csrfToken() });
+};
+
+//Login method to access the app. Redirects to main app page on success.
 const login = (request, response) => {
   const req = request;
   const res = response;
@@ -37,6 +43,8 @@ const login = (request, response) => {
   });
 };
 
+//Method to create an account.
+//Has to make sure to encrypt the password that the user provides for safety.
 const signup = (request, response) => {
   const req = request;
   const res = response;
@@ -81,6 +89,8 @@ const signup = (request, response) => {
   });
 };
 
+//Method to change an account's password.
+//Checks if the provided parameters are valid, then sends to model to set the new password.
 const passwordChange = (request, response) => {
     const req = request;
     const res = response;
@@ -102,19 +112,49 @@ const passwordChange = (request, response) => {
     const oldPass = `${req.body.oldPass}`;
     const newPass = `${req.body.pass1}`;
     
-    let hashedPass = "";
-    
-    Account.AccountModel.generateHash(newPass, (salt, hash) => {
-        hashedPass = hash;
-    });
-    
-    return Account.AccountModel.changePassword(username, oldPass, hashedPass, (err, account) => {
+    return Account.AccountModel.changePassword(username, oldPass, newPass, (err, account) => {
         if (err || !account) {
           return res.status(401).json({ error: 'Wrong username or password' });
         }
-        
-        return res.status(400).json({ error: 'This is not an error. The passwords were changed properly :3' });
     });
+}
+
+//Method to find another person's task list.
+//Provides username, then sends to account model to return listing.
+const friendSearch = (request, response) => {
+    const req = request;
+    const res = response;
+  
+    req.body.friendSearchName = `${req.body.friendSearchName}`;
+    
+    if (!req.body.friendSearchName) {
+        return res.status(400).json({ error: 'RAWR! Enter an account name!'});
+    }
+    
+    return Account.AccountModel.findByUsername(req.body.friendSearchName, (err, doc) => {
+        if (err || !doc) {
+            return res.status(401).json({ error: 'Invalid username!' });
+        }
+        return res.json({user: doc});
+    });
+}
+
+//Method to set an account to premium and adds an email to their account.
+const setPremium = (request, response) => {
+    const req = request;
+    const res = response;
+    
+    req.body.email = `${req.body.email}`;
+    
+    if (!req.body.email) {
+        return res.status(400).json({ error: 'RAWR! Enter an email to link to a premium account!'});
+    }
+    
+    return Account.AccountModel.setPremium(req.session.account._id, req.body.email, (err, doc) => {
+        if (err || !doc) {
+            return res.status(401).json({ error: 'Something went wrong!' });
+        }
+    })
 }
 
 const getToken = (request, response) => {
@@ -134,5 +174,8 @@ module.exports.logout = logout;
 module.exports.signup = signup;
 module.exports.getToken = getToken;
 module.exports.passwordChange = passwordChange;
-module.exports.passwordChangePage = passwordChangePage;
+module.exports.accountSettingsPage = accountSettingsPage;
+module.exports.setPremium = setPremium;
+module.exports.friendTasksPage = friendTasksPage;
+module.exports.friendSearch = friendSearch;
 

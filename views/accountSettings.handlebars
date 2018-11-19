@@ -8,19 +8,22 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
-  <link rel="shortcut icon" href="/assets/img/favicon.png"/>
+  <link rel="shortcut icon" href="/assets/img/complete_symbol.jpg"/>
   <link rel="stylesheet" type="text/css" href="/assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 </head>
 <body> 
-  <nav><a href="/login"><img id="logo" src="/assets/img/face.png" alt="face logo"/></a>
-    <div class="navlink"><a href="/maker">Home</a></div>
+    <nav><div class="title"><a href="/login">Task Manager</a></div>
     <div class="navlink"><a href="/logout">Log out</a></div>
-    <div class="navlink"><a href="/passwordChange">Change password</a></div>
+    <div class="navlink"><a href="/accountSettings">Account Settings</a></div>
+    <div class="navlink"><a href="/friendTasks">Friend's Tasks</a></div>
+    <div class="navlink"><a href="/maker">Home</a></div>
   </nav>
-  <section id="content"></section>
+  <section id="premiumUser"></section>
+  <section id="passwordChange"></section>
   <div id="domoMessage"><img id="speech" src="/assets/img/speech.png" alt="speech box"/>
-    <h3><span id="errorMessage">Please make sure passwords are identical.</span></h3><img id="domo" src="assets/img/domo.png" alt="domo"/>
+    <h3><span id="errorMessage">Please make sure passwords are identical.</span></h3><img id="domo" src="assets/img/likulau_think.png" alt="likulau_think"/>
   </div>
-  <script src="/assets/passwordBundle.js"></script>
+  <script src="/assets/accountSettingsBundle.js"></script>
 </body>
 </html>

@@ -10,11 +10,13 @@
   "scripts": {
     "buildLoginBundle": "babel ./client/login ./client/helper --presets react --out-file ./hosted/loginBundle.js",
     "buildAppBundle": "babel ./client/app ./client/helper --presets react --outfile ./hosted/bundle.js",
-    "buildPasswordBundle": "babel ./client/changePassword ./client/helper --presets react --outfile ./hosted/passwordBundle.js",
-    "build": "npm run buildLoginBundle && npm run buildAppBundle && npm run buildPasswordBundle",
+    "buildAccountSettingsBundle": "babel ./client/accountSettings ./client/helper --presets react --outfile ./hosted/accountSettingsBundle.js",
+    "buildFriendViewBundle": "babel ./client/friendView ./client/helper --presets react --outfile ./hosted/friendViewBundle.js",
+    "build": "npm run buildLoginBundle && npm run buildAppBundle && npm run buildAccountSettingsBundle",
     "watchLoginBundle": "babel --watch ./client/login ./client/helper --presets react --out-file ./hosted/loginBundle.js",
     "watchAppBundle": "babel --watch ./client/app ./client/helper --presets react --out-file ./hosted/bundle.js",
-    "watchPasswordBundle": "babel --watch ./client/changePassword ./client/helper --presets react --out-file ./hosted/passwordBundle.js",
+    "watchAccountSettingsBundle": "babel --watch ./client/accountSettings ./client/helper --presets react --out-file ./hosted/accountSettingsBundle.js",
+    "watchFriendViewBundle": "babel --watch ./client/friendView ./client/helper --presets react --out-file ./hosted/friendViewBundle.js",
     "nodemon": "nodemon --watch ./server ./server/app.js",
     "start": "node ./server/app.js",
     "pretest": "eslint ./server --fix",
@@ -26,7 +28,7 @@
     "Redis",
     "Login"
   ],
-  "author": "Cody Van De Mark",
+  "author": "HanSoo Lee",
   "license": "Apache 2.0",
   "dependencies": {
     "body-parser": "^1.15.0",

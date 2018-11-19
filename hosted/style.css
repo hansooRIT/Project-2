@@ -4,6 +4,7 @@ html, body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background-color: #c9cfd8;
 }
 
 #logo {
@@ -16,78 +17,96 @@ html, body {
 
 nav {
     width: 100%;
-    height: 50px;
-    background-color: #55acee;
+    height: 60px;
+    background-color: #071d42;
 }
 
 nav:nth-child(1) {
     padding-left: 25px;
 }
 
-.navlink {
+.title {
+    float: left;
     padding: 5px;
-    padding-top: 12px;
-    padding-left: 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+    color: white;
+    font-size: 1.7em;
+    font-family: 'Raleway', sans-serif;
+}
+
+.title a, .title a:link, .title a:visited, .title a:hover, .title a:active {
+    color: white;
+    text-decoration: none;
+    padding: 5px;
+}
+
+.navlink {
+    float: right;
+    padding: 5px;
+    padding-top: 20px;
+    padding-right: 20px;
     color: white;
     font-size: 1.3em;
-    float: left;
+    font-family: 'Raleway', sans-serif;
 }
 
 .navlink a, .navlink a:link, .navlink a:visited, .navlink a:hover, .navlink a:active {
     color: white;
     text-decoration: none;
     padding: 5px;
+    border-style: solid;
+    border-width: 1px;
     border-radius: 4px;
-    background-color: #55acee;
+    background-color: #071d42;
     transition: background-color 0.4s ease;
 }
 
 .navlink a:hover {
     transition: background-color 0.8s ease;
-    background-color: #66bdff;
+    background-color: #0e3472;
 }
 
-.domoForm {
-    border: 2px solid #338acc;
-    height: 35px;
-    width: 700px;
-    margin-top:0px;
-    padding-top:10px;
-    background-color: #55acee;
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
-}
-
-.domoForm label {
+#makeTask {
     display: inline-block;
-    width: 75px;
-    margin-left: 10px;
-    font-size: 1.2em;
-    float: left;
-    color: white;
+    width: 49.8%;
+    margin: 0 auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-family: 'Raleway', sans-serif;
+    border-style: solid;
+    border-width: 1px;
+    border-color: 'black';
 }
 
-.domoForm input[type=text] {
-    float:left;
+#filterTasks {
+    display: inline-block;
+    width: 49.7%;
+    margin: 0 auto;
+    padding-top: 9px;
+    padding-bottom: 10px;
+    font-family: 'Raleway', sans-serif;
+    border-style: solid;
+    border-width: 1px;
+    border-color: 'black';
 }
 
-.makeDomoSubmit {
-    transition: background-color 0.4s ease;
-    display: inline;
-    width: 90px;
-    background-color: #55acee;
-    border-radius: 2px;
-    color: white;
-    text-decoration: none;
+#filterTasks h2 {
+    padding-left: 10px;
 }
 
-.makeDomoSubmit:link, .makeDomoSubmit:visited, .makeDomoSubmit:hover, .makeDomoSubmit:active {
-    color: white;
-}
-
-.makeDomoSubmit:hover {
-    transition: background-color 0.4s ease;
-    background-color: #338acc;
+#friendSearchForm {
+    display: block;
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-family: 'Raleway', sans-serif;
+    border-style: solid;
+    border-width: 1px;
+    border-color: 'black';
 }
 
 .mainForm {
@@ -96,6 +115,7 @@ nav:nth-child(1) {
     margin: 0 auto;
     padding-top: 350px;
     font-size: 1.2em;
+    font-family: 'Raleway', sans-serif;
 }
 
 .mainForm h3 {
@@ -124,6 +144,7 @@ nav:nth-child(1) {
     padding: 3px 0px;
     color: white;
     text-decoration: none;
+    
 }
 
 .formSubmit:link, .formSubmit:visited, .formSubmit:hover, .formSubmit:active {
@@ -135,16 +156,62 @@ nav:nth-child(1) {
     background-color: #338acc;
 }
 
-#user, #pass, #pass2 {
+.task {
+    width: 100%;
+}
+
+input[type=text], input[type=password] {
     text-align: center;
     font-size: 1.1em;
     width: 180px;
     border-radius: 6px;
 }
 
-#user:focus, #pass:focus, #pass2:focus {
+#user:focus, #oldPass:focus, #pass:focus, #pass2:focus {
     outline: none;
     box-shadow: 0px 0px 1px 1px #55acee;
+}
+
+#premiumUserForm {
+    width: 90%;
+    display: block;
+    margin: auto;
+    float: left;
+    padding-left: 5px;
+    font-family: 'Raleway', sans-serif;
+}
+
+
+#passwordChangeForm {
+    width: 90%;
+    display: block;
+    margin: auto;
+    float: left;
+    padding-left: 5px;
+    font-family: 'Raleway', sans-serif;
+}
+
+input[type=submit] {
+    border-radius: 8px;
+}
+
+input[type=submit]:hover {
+    background-color: 
+}
+
+#tasks {
+    width: 40%;
+    min-width: 400px;
+    border: 2px solid #55acee;
+    border-radius: 4px;
+    margin: 0 auto;
+    margin-top: 100px;
+    font-family: 'Raleway', sans-serif;
+}
+
+.task {
+    width: 100%;
+    bprder: 
 }
 
 #domoMessage {
@@ -181,21 +248,12 @@ nav:nth-child(1) {
 #domo {
     z-index: 225;
     margin-top: -20px;
-    margin-left: 135px;
-    height: 450px;
-    width: 300px;
+    margin-left: 35px;
+    height: 350px;
+    width: 350px;
     -ms-transform: rotate(330deg);
     -webkit-transform: rotate(330deg); 
     transform: rotate(330deg);
-}
-
-#tasks {
-    width: 40%;
-    min-width: 400px;
-    border: 2px solid #55acee;
-    border-radius: 4px;
-    margin: 0 auto;
-    margin-top: 100px;
 }
 
 .domo {
@@ -238,25 +296,14 @@ h3.emptyTask {
 
 h3.taskName {
     float:left;
-    width: 200px;
     font-weight: bold;
     padding-left: 65px;
     font-size: 1.5em;
 }
 
-h3.domoAge {
+h3.taskDesc {
     float:right;
-    text-align: left;
-    width: 100px;
-    font-weight: bold;
-    padding-right: 40px;
-    font-size: 1.5em;
-}
-
-.domo:first-child {
-    margin-top: 10px;
-}
-
-.domo:last-child {
-    margin-bottom:10px;
+    font-size: 1.3em;
+    padding-right: 60px;
+    max-width: 35%;
 }
