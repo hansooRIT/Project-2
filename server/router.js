@@ -20,6 +20,7 @@ const router = (app) => {
   app.post('/passwordChange', mid.requiresLogin, controllers.Account.passwordChange);
   app.delete('/deleteNode', mid.requiresLogin, controllers.Task.deleteNode);
   app.post('/completeNode', mid.requiresLogin, controllers.Task.completeNode);
+  app.post('/sendEmail', mid.requiresLogin, controllers.Account.sendEmail);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
 };
 
