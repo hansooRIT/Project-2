@@ -28,22 +28,6 @@ const handlePremiumUser = (e) => {
     return false;
 };
 
-//Handles requests for setting an account to premium.
-//Requires an email for saving to the database entry.
-const handleEmail = (e) => {
-    e.preventDefault();
-    
-    $("#domoMessage").animate({width: 'hide'}, 350);
-    
-    if ($("#emailRecipient").val() == '') {
-        handleError("Specify email address to send mail to!");
-        return false;
-    }
-    sendAjax('POST', $("#emailForm").attr("action"), $("#emailForm").serialize(), redirect);
-    return false;
-};
-
-
 //Form for password changing.
 //Takes in username, old password, and 2 instances of new password.
 const PasswordChangeWindow = (props) => {
@@ -77,18 +61,6 @@ const PremiumUserWindow = (props) => {
     );
 };
 
-const EmailWindow = (props) => {
-    return (
-        <form id="emailForm" name="emailForm" onSubmit={handleEmail} action="/sendEmail" method="POST" className="emailForm">
-            <h3>Send Email?</h3>
-            <input id="emailRecipient" type="text" name="emailRecipient" placeholder="Email"/><br/><br/>
-            <input type="hidden" name="_csrf" value={props.csrf}/>
-            <input className="emailSubmit" type="submit" value="Send"/>
-            <hr/>
-        </form>
-    );
-};
-
 const setup = (csrf) => {
     ReactDOM.render(
         <PremiumUserWindow csrf={csrf} />, document.querySelector("#premiumUser")
@@ -96,10 +68,6 @@ const setup = (csrf) => {
     
     ReactDOM.render(
         <PasswordChangeWindow csrf={csrf} />, document.querySelector("#passwordChange")
-    );
-    
-    ReactDOM.render(
-        <EmailWindow csrf={csrf} />, document.querySelector("#sendEmail")
     );
 };
 

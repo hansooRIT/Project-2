@@ -30,21 +30,6 @@ var handlePremiumUser = function handlePremiumUser(e) {
     return false;
 };
 
-//Handles requests for setting an account to premium.
-//Requires an email for saving to the database entry.
-var handleEmail = function handleEmail(e) {
-    e.preventDefault();
-
-    $("#domoMessage").animate({ width: 'hide' }, 350);
-
-    if ($("#emailRecipient").val() == '') {
-        handleError("Specify email address to send mail to!");
-        return false;
-    }
-    sendAjax('POST', $("#emailForm").attr("action"), $("#emailForm").serialize(), redirect);
-    return false;
-};
-
 //Form for password changing.
 //Takes in username, old password, and 2 instances of new password.
 var PasswordChangeWindow = function PasswordChangeWindow(props) {
@@ -96,30 +81,10 @@ var PremiumUserWindow = function PremiumUserWindow(props) {
     );
 };
 
-var EmailWindow = function EmailWindow(props) {
-    return React.createElement(
-        "form",
-        { id: "emailForm", name: "emailForm", onSubmit: handleEmail, action: "/sendEmail", method: "POST", className: "emailForm" },
-        React.createElement(
-            "h3",
-            null,
-            "Send Email?"
-        ),
-        React.createElement("input", { id: "emailRecipient", type: "text", name: "emailRecipient", placeholder: "Email" }),
-        React.createElement("br", null),
-        React.createElement("br", null),
-        React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
-        React.createElement("input", { className: "emailSubmit", type: "submit", value: "Send" }),
-        React.createElement("hr", null)
-    );
-};
-
 var setup = function setup(csrf) {
     ReactDOM.render(React.createElement(PremiumUserWindow, { csrf: csrf }), document.querySelector("#premiumUser"));
 
     ReactDOM.render(React.createElement(PasswordChangeWindow, { csrf: csrf }), document.querySelector("#passwordChange"));
-
-    ReactDOM.render(React.createElement(EmailWindow, { csrf: csrf }), document.querySelector("#sendEmail"));
 };
 
 var getToken = function getToken() {
