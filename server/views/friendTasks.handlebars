@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Task Manager</title>
+  <script crossorigin src="https://unpkg.com/react@15/dist/react.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+  <script crossorigin src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+</head>
+<body> 
+  <nav><div class="title"><a href="/login">Task Manager</a></div>
+    <div class="navlink"><a href="/logout">Log out</a></div>
+    <div class="navlink"><a href="/accountSettings">Account Settings</a></div>
+    <div class="navlink"><a href="/friendTasks">Friend's Tasks</a></div>
+    <div class="navlink"><a href="/maker">Home</a></div>
+  </nav>
+  <section id="friendSearch">
+  </section>
+  <section id="tasks">
+  </section>
+  <div id="domoMessage"><img id="speech" src="/assets/img/speech.png" alt="speech box"/>
+    <h3><span id="errorMessage">Please make sure passwords are identical.</span></h3><img id="domo" src="assets/img/likulau_think.png" alt="likulau_think"/>
+  </div>
+  <script src="/assets/friendViewBundle.js"></script>
+</body>
+</html>
