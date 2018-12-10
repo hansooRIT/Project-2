@@ -141,6 +141,7 @@ const friendSearch = (request, response) => {
   });
 };
 
+// Method to add a friend to an account's friends list.
 const addFriend = (request, response) => {
   const req = request;
   const res = response;
@@ -150,8 +151,6 @@ const addFriend = (request, response) => {
   if (!req.body.addFriendName) {
     return res.status(400).json({ error: 'RAWR! Enter a friend account name!' });
   }
-
-  console.log('attempting to add to friends list');
 
   return Account.AccountModel.addFriend(req.session.account._id,
                                         req.body.addFriendName, (err, doc) => {

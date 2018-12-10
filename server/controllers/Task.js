@@ -52,8 +52,6 @@ const getTasks = (request, response) => {
   const req = request;
   const res = response;
 
-  console.log(req);
-
   return Task.TaskModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
       console.log(err);

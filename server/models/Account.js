@@ -12,6 +12,15 @@ const keyLength = 64;
 
 const convertID = mongoose.Types.ObjectId;
 
+/*
+Second schema for friends list functionality.
+AccountSchema has a subdocument, which is like
+an array, of this schema for each account.
+
+The usePushEach specification is necessary due
+to schemas and subdocuments using pushAll by default
+and that is deprecated.
+*/
 const FriendListSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -73,8 +82,7 @@ const AccountSchema = new mongoose.Schema({
 },
   {
     usePushEach: true,
-  }
-                                         );
+  });
 
 AccountSchema.statics.toAPI = doc => ({
   // _id is built into your mongo document and is guaranteed to be unique
@@ -171,7 +179,7 @@ AccountSchema.statics.changePassword = (username, oldPass, newPass, callback) =>
       });
     });
 
-// Method to set an email and premium status to an account.
+// Method to set premium status to an account.
 // Finds the account by id, then adds the appropriate fields.
 AccountSchema.statics.setPremium = (id, callback) =>
     AccountModel.findByID(id, (err, doc) => {
@@ -194,6 +202,8 @@ AccountSchema.statics.setPremium = (id, callback) =>
       });
     });
 
+// Method to add a friend to the account's friends list.
+// Sends a confirmation email to the recipient.
 AccountSchema.statics.addFriend = (userID, friendName, callback) => {
   AccountModel.findByUsername(friendName, (err, doc) => {
     if (err) {
@@ -232,7 +242,6 @@ AccountSchema.statics.addFriend = (userID, friendName, callback) => {
     // Verify that we were able to create the transporter.
       transporter.verify((emailErr) => {
         if (emailErr) {
-          console.dir('Something is wrong with the email transporter');
           return emailErr;
         }
         return null;

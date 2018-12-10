@@ -19,6 +19,8 @@ var handleFriendSearch = function handleFriendSearch(e) {
     return false;
 };
 
+//Handler for adding friend to friend list
+//Errors out if no username is provided. Sends an Ajax request otherwise.
 var handleAddFriend = function handleAddFriend(e) {
     e.preventDefault();
 
@@ -39,8 +41,6 @@ var handleAddFriend = function handleAddFriend(e) {
 //Handles request to delete a task, send the Ajax request to the database, and call another method to re-render the task listing.
 var handleListedFriendSearch = function handleListedFriendSearch(e) {
     e.preventDefault();
-
-    console.log($("#" + e.target.id).serialize());
 
     sendAjax('POST', $("#" + e.target.id).attr("action"), $("#" + e.target.id).serialize(), function (data) {
         loadFriendTasksFromServer(data);
@@ -69,6 +69,8 @@ var FriendSearchForm = function FriendSearchForm(props) {
     );
 };
 
+//Form for adding a friend to the friends list.
+//Searches via username.
 var AddFriendForm = function AddFriendForm(props) {
     return React.createElement(
         "form",
@@ -102,31 +104,59 @@ var TaskList = function TaskList(props) {
     }
 
     var taskNodes = props.tasks.map(function (task) {
-        return React.createElement(
-            "div",
-            { key: task._id, className: "task" },
-            React.createElement("img", { src: "/assets/img/incomplete.png", alt: "incomplete", className: "domoFace" }),
-            React.createElement(
-                "h3",
-                { className: "taskName" },
-                "Name: ",
-                task.name,
-                " "
-            ),
-            React.createElement(
-                "h3",
-                { className: "taskDesc" },
-                "Description: ",
-                task.description,
-                " "
-            ),
-            React.createElement("input", { type: "hidden", name: "taskOverdue", value: task.overdue }),
-            React.createElement("br", null),
-            React.createElement("br", null),
-            React.createElement("br", null),
-            React.createElement("br", null),
-            React.createElement("br", null)
-        );
+        if (task.isComplete) {
+            return React.createElement(
+                "div",
+                { key: task._id, className: "task" },
+                React.createElement("img", { src: "/assets/img/complete_symbol.jpg", alt: "complete", className: "domoFace" }),
+                React.createElement(
+                    "h3",
+                    { className: "taskName" },
+                    "Name: ",
+                    task.name,
+                    " "
+                ),
+                React.createElement(
+                    "h3",
+                    { className: "taskDesc" },
+                    "Description: ",
+                    task.description,
+                    " "
+                ),
+                React.createElement("input", { type: "hidden", name: "taskOverdue", value: task.overdue }),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement("br", null)
+            );
+        } else {
+            return React.createElement(
+                "div",
+                { key: task._id, className: "task" },
+                React.createElement("img", { src: "/assets/img/incomplete.png", alt: "incomplete", className: "domoFace" }),
+                React.createElement(
+                    "h3",
+                    { className: "taskName" },
+                    "Name: ",
+                    task.name,
+                    " "
+                ),
+                React.createElement(
+                    "h3",
+                    { className: "taskDesc" },
+                    "Description: ",
+                    task.description,
+                    " "
+                ),
+                React.createElement("input", { type: "hidden", name: "taskOverdue", value: task.overdue }),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement("br", null)
+            );
+        }
     });
 
     return React.createElement(
@@ -136,6 +166,7 @@ var TaskList = function TaskList(props) {
     );
 };
 
+//Creates all of the nodes for the friends list, then populates a ReactDOM to render it.
 var FriendList = function FriendList(props) {
     if (props.friends.length === 0) {
         return React.createElement(
@@ -164,7 +195,8 @@ var FriendList = function FriendList(props) {
                 ),
                 React.createElement("input", { type: "hidden", name: "friendSearchName", value: friend.username }),
                 React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
-                React.createElement("input", { className: "listedFriendSearchSubmit", type: "submit", value: "View Friend's Tasks" })
+                React.createElement("input", { className: "listedFriendSearchSubmit", type: "submit", value: "View Friend's Tasks" }),
+                React.createElement("hr", null)
             )
         );
     });
@@ -184,7 +216,7 @@ var loadFriendTasksFromServer = function loadFriendTasksFromServer(accountData) 
         return false;
     }
     sendAjax('GET', '/getFriendTasks', accountData.user, function (data) {
-        ReactDOM.render(React.createElement(TaskList, { tasks: data.tasks }), document.querySelector("#tasks"));
+        ReactDOM.render(React.createElement(TaskList, { tasks: data.tasks }), document.querySelector("#friendTasks"));
     });
 };
 
@@ -201,7 +233,7 @@ var setup = function setup(csrf) {
 
     ReactDOM.render(React.createElement(FriendList, { csrf: csrf, friends: [] }), document.querySelector("#friendList"));
 
-    ReactDOM.render(React.createElement(TaskList, { tasks: [] }), document.querySelector("#tasks"));
+    ReactDOM.render(React.createElement(TaskList, { tasks: [] }), document.querySelector("#friendTasks"));
 
     loadFriendListFromServer(csrf);
 };

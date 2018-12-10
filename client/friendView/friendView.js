@@ -17,6 +17,8 @@ const handleFriendSearch = (e) => {
     return false;
 };
 
+//Handler for adding friend to friend list
+//Errors out if no username is provided. Sends an Ajax request otherwise.
 const handleAddFriend = (e) => {
     e.preventDefault();
     
@@ -37,9 +39,7 @@ const handleAddFriend = (e) => {
 //Handles request to delete a task, send the Ajax request to the database, and call another method to re-render the task listing.
 const handleListedFriendSearch = (e) => {
     e.preventDefault();
-    
-    console.log($("#" + e.target.id).serialize());
-    
+
     sendAjax('POST', $("#" + e.target.id).attr("action"), $("#" + e.target.id).serialize(), (data) => {
         loadFriendTasksFromServer(data);
     });
@@ -61,6 +61,8 @@ const FriendSearchForm = (props) => {
     );
 };
 
+//Form for adding a friend to the friends list.
+//Searches via username.
 const AddFriendForm = (props) => {
     return (
         <form id="addFriendForm" onSubmit={handleAddFriend} name="addFriendForm" action="/addFriend" method="POST" className="addFriendForm">
@@ -83,14 +85,27 @@ const TaskList = (props) => {
     }
     
     const taskNodes = props.tasks.map(function(task) {
-        return (
-            <div key={task._id} className="task">
-                <img src="/assets/img/incomplete.png" alt="incomplete" className="domoFace"/>
-                <h3 className="taskName">Name: {task.name} </h3>
-                <h3 className="taskDesc">Description: {task.description} </h3>
-                <input type="hidden" name="taskOverdue" value={task.overdue}/><br/><br/><br/><br/><br/>
-            </div>
-        );
+        if (task.isComplete) {
+            return (
+                <div key={task._id} className="task">
+                    <img src="/assets/img/complete_symbol.jpg" alt="complete" className="domoFace"/>
+                    <h3 className="taskName">Name: {task.name} </h3>
+                    <h3 className="taskDesc">Description: {task.description} </h3>
+                    <input type="hidden" name="taskOverdue" value={task.overdue}/><br/><br/><br/><br/><br/>
+                </div>
+            );
+        }
+        else {
+            return (
+                <div key={task._id} className="task">
+                    <img src="/assets/img/incomplete.png" alt="incomplete" className="domoFace"/>
+                    <h3 className="taskName">Name: {task.name} </h3>
+                    <h3 className="taskDesc">Description: {task.description} </h3>
+                    <input type="hidden" name="taskOverdue" value={task.overdue}/><br/><br/><br/><br/><br/>
+                </div>
+            );
+        }
+        
     });
 
     return (
@@ -100,6 +115,7 @@ const TaskList = (props) => {
     );
 };
 
+//Creates all of the nodes for the friends list, then populates a ReactDOM to render it.
 const FriendList = (props) => {
     if (props.friends.length === 0) {
         return (
@@ -117,12 +133,13 @@ const FriendList = (props) => {
                     <input type="hidden" name="friendSearchName" value={friend.username}/>
                     <input type="hidden" name="_csrf" value={props.csrf}/>
                     <input className="listedFriendSearchSubmit" type="submit" value="View Friend's Tasks"/>
+                    <hr/>
                 </form>
             </div>
         );
     });
     
-        //Then, return all of the newly generated task nodes in a single div.
+    //Then, return all of the newly generated task nodes in a single div.
     return (
         <div className="friendList">
             {friendNodes}
@@ -138,7 +155,7 @@ const loadFriendTasksFromServer = (accountData) => {
     }
     sendAjax('GET', '/getFriendTasks', accountData.user, (data) => {
         ReactDOM.render(
-            <TaskList tasks={data.tasks} />, document.querySelector("#tasks")
+            <TaskList tasks={data.tasks} />, document.querySelector("#friendTasks")
         );
     });
 };
@@ -165,7 +182,7 @@ const setup = (csrf) => {
     );
     
     ReactDOM.render(
-        <TaskList tasks={[]}/>, document.querySelector("#tasks")
+        <TaskList tasks={[]}/>, document.querySelector("#friendTasks")
     );
     
     loadFriendListFromServer(csrf);
