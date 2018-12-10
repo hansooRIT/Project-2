@@ -31,9 +31,9 @@ const FriendListSchema = new mongoose.Schema({
     default: false,
   },
 },
-{
-    usePushEach: true
-});
+  {
+    usePushEach: true,
+  });
 
 const AccountSchema = new mongoose.Schema({
   username: {
@@ -71,9 +71,9 @@ const AccountSchema = new mongoose.Schema({
     default: Date.now,
   },
 },
-{
-    usePushEach: true
-}
+  {
+    usePushEach: true,
+  }
                                          );
 
 AccountSchema.statics.toAPI = doc => ({
@@ -218,43 +218,43 @@ AccountSchema.statics.addFriend = (userID, friendName, callback) => {
         isPremium: doc.isPremium,
       });
 
-    const transport = {
-      service: 'gmail',
-      host: 'smtp.gmail.com',
-      auth: {
-        user: emailCredentials.user,
-        pass: emailCredentials.password,
-      },
-    };
+      const transport = {
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+          user: emailCredentials.user,
+          pass: emailCredentials.password,
+        },
+      };
 
-    const transporter = nodeMailer.createTransport(transport);
+      const transporter = nodeMailer.createTransport(transport);
 
     // Verify that we were able to create the transporter.
-    transporter.verify((emailErr) => {
-      if (emailErr) {
-        console.dir('Something is wrong with the email transporter');
-        return emailErr;
-      }
-      return null;
-    });
+      transporter.verify((emailErr) => {
+        if (emailErr) {
+          console.dir('Something is wrong with the email transporter');
+          return emailErr;
+        }
+        return null;
+      });
 
     // Construct the email based on the request data.
-    const mail = {
-      from: emailCredentials.user,
-      to: doc.email,
-      subject: 'Task Manager - Someone added you as a friend!',
-      text: `${document.username} has added you as a friend on Task Manager!`,
-    };
+      const mail = {
+        from: emailCredentials.user,
+        to: doc.email,
+        subject: 'Task Manager - Someone added you as a friend!',
+        text: `${document.username} has added you as a friend on Task Manager!`,
+      };
 
     // Then send it.
-    transporter.sendMail(mail, (emailErr) => {
-      if (emailErr) {
-        return emailErr;
-      }
-      return null;
-    });
-        
-     return document.save((docError, newDoc) => {
+      transporter.sendMail(mail, (emailErr) => {
+        if (emailErr) {
+          return emailErr;
+        }
+        return null;
+      });
+
+      return document.save((docError, newDoc) => {
         if (docError) {
           return callback(docError);
         }

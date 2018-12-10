@@ -1,7 +1,4 @@
 const models = require('../models');
-const nodeMailer = require('nodemailer');
-const emailCredentials = require('../config/config.js');
-
 const Account = models.Account;
 
 const logout = (req, res) => {
@@ -171,7 +168,7 @@ const setPremium = (request, response) => {
   const req = request;
   const res = response;
 
-  return Account.AccountModel.setPremium(req.session.account._id,(err, doc) => {
+  return Account.AccountModel.setPremium(req.session.account._id, (err, doc) => {
     if (err || !doc) {
       return res.status(401).json({ error: 'Something went wrong!' });
     }
@@ -190,7 +187,7 @@ const getFriendsList = (request, response) => {
     }
     return res.json({ friends: doc.friendsList });
   });
-}
+};
 
 const getToken = (request, response) => {
   const req = request;
