@@ -21,27 +21,7 @@ var handlePremiumUser = function handlePremiumUser(e) {
     e.preventDefault();
 
     $("#domoMessage").animate({ width: 'hide' }, 350);
-
-    if ($("#email").val() == '') {
-        handleError("Email required to be premium user!");
-        return false;
-    }
     sendAjax('POST', $("#premiumUserForm").attr("action"), $("#premiumUserForm").serialize(), redirect);
-    return false;
-};
-
-//Handles requests for setting an account to premium.
-//Requires an email for saving to the database entry.
-var handleEmail = function handleEmail(e) {
-    e.preventDefault();
-
-    $("#domoMessage").animate({ width: 'hide' }, 350);
-
-    if ($("#emailRecipient").val() == '') {
-        handleError("Specify email address to send mail to!");
-        return false;
-    }
-    sendAjax('POST', $("#emailForm").attr("action"), $("#emailForm").serialize(), redirect);
     return false;
 };
 
@@ -87,29 +67,8 @@ var PremiumUserWindow = function PremiumUserWindow(props) {
             null,
             "Pay a small fee of $2 per month for additional features!"
         ),
-        React.createElement("input", { id: "email", type: "text", name: "email", placeholder: "Email" }),
-        React.createElement("br", null),
-        React.createElement("br", null),
         React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
         React.createElement("input", { className: "premiumUserSubmit", type: "submit", value: "Become premium" }),
-        React.createElement("hr", null)
-    );
-};
-
-var EmailWindow = function EmailWindow(props) {
-    return React.createElement(
-        "form",
-        { id: "emailForm", name: "emailForm", onSubmit: handleEmail, action: "/sendEmail", method: "POST", className: "emailForm" },
-        React.createElement(
-            "h3",
-            null,
-            "Send Email?"
-        ),
-        React.createElement("input", { id: "emailRecipient", type: "text", name: "emailRecipient", placeholder: "Email" }),
-        React.createElement("br", null),
-        React.createElement("br", null),
-        React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
-        React.createElement("input", { className: "emailSubmit", type: "submit", value: "Send" }),
         React.createElement("hr", null)
     );
 };
@@ -118,8 +77,6 @@ var setup = function setup(csrf) {
     ReactDOM.render(React.createElement(PremiumUserWindow, { csrf: csrf }), document.querySelector("#premiumUser"));
 
     ReactDOM.render(React.createElement(PasswordChangeWindow, { csrf: csrf }), document.querySelector("#passwordChange"));
-
-    ReactDOM.render(React.createElement(EmailWindow, { csrf: csrf }), document.querySelector("#sendEmail"));
 };
 
 var getToken = function getToken() {

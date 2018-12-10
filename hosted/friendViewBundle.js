@@ -19,6 +19,36 @@ var handleFriendSearch = function handleFriendSearch(e) {
     return false;
 };
 
+var handleAddFriend = function handleAddFriend(e) {
+    e.preventDefault();
+
+    $("#domoMessage").animate({ width: 'hide' }, 350);
+
+    if ($("#addFriendName").val() == '') {
+        handleError("Please enter a friend's username!");
+        return false;
+    }
+
+    sendAjax('POST', $("#addFriendForm").attr("action"), $("#addFriendForm").serialize(), function (data) {
+        loadFriendListFromServer($("#addFriendForm").find('input:hidden').val());
+    });
+
+    return false;
+};
+
+//Handles request to delete a task, send the Ajax request to the database, and call another method to re-render the task listing.
+var handleListedFriendSearch = function handleListedFriendSearch(e) {
+    e.preventDefault();
+
+    console.log($("#" + e.target.id).serialize());
+
+    sendAjax('POST', $("#" + e.target.id).attr("action"), $("#" + e.target.id).serialize(), function (data) {
+        loadFriendTasksFromServer(data);
+    });
+
+    return false;
+};
+
 //Form for searching for a friend's tasks.
 //Only requires the friend's name as input to find their tasks.
 var FriendSearchForm = function FriendSearchForm(props) {
@@ -39,6 +69,24 @@ var FriendSearchForm = function FriendSearchForm(props) {
     );
 };
 
+var AddFriendForm = function AddFriendForm(props) {
+    return React.createElement(
+        "form",
+        { id: "addFriendForm", onSubmit: handleAddFriend, name: "addFriendForm", action: "/addFriend", method: "POST", className: "addFriendForm" },
+        React.createElement(
+            "h2",
+            null,
+            "Add friend to friends list"
+        ),
+        React.createElement("input", { id: "addFriendName", type: "text", name: "addFriendName", placeholder: "Add Friend Name" }),
+        React.createElement("br", null),
+        React.createElement("br", null),
+        React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
+        React.createElement("input", { className: "addFriendSubmit", type: "submit", value: "Add Friend" }),
+        React.createElement("br", null)
+    );
+};
+
 //Creates all of the friend's task nodes in a ReactDOM in order to render it later.
 var TaskList = function TaskList(props) {
     if (props.tasks.length === 0) {
@@ -54,7 +102,6 @@ var TaskList = function TaskList(props) {
     }
 
     var taskNodes = props.tasks.map(function (task) {
-
         return React.createElement(
             "div",
             { key: task._id, className: "task" },
@@ -82,20 +129,51 @@ var TaskList = function TaskList(props) {
         );
     });
 
-    //Do this to access the friend's user name and display it.
-    var formData = $("#friendSearchForm").serializeArray();
-
     return React.createElement(
         "div",
         { className: "taskList" },
-        React.createElement(
-            "h3",
-            null,
-            "Here are ",
-            formData[0].value,
-            "'s tasks'"
-        ),
         taskNodes
+    );
+};
+
+var FriendList = function FriendList(props) {
+    if (props.friends.length === 0) {
+        return React.createElement(
+            "div",
+            { className: "friendList" },
+            React.createElement(
+                "h3",
+                { className: "emptyFriendList" },
+                "No current friends"
+            )
+        );
+    }
+
+    var friendNodes = props.friends.map(function (friend) {
+        return React.createElement(
+            "div",
+            null,
+            React.createElement(
+                "form",
+                { id: friend._id, onSubmit: handleListedFriendSearch, name: "listedFriendForm", action: "/friendSearch", method: "POST", className: "listedFriendForm" },
+                React.createElement(
+                    "h3",
+                    { id: "friendSearchName", className: "friendName" },
+                    friend.username,
+                    " "
+                ),
+                React.createElement("input", { type: "hidden", name: "friendSearchName", value: friend.username }),
+                React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
+                React.createElement("input", { className: "listedFriendSearchSubmit", type: "submit", value: "View Friend's Tasks" })
+            )
+        );
+    });
+
+    //Then, return all of the newly generated task nodes in a single div.
+    return React.createElement(
+        "div",
+        { className: "friendList" },
+        friendNodes
     );
 };
 
@@ -110,10 +188,22 @@ var loadFriendTasksFromServer = function loadFriendTasksFromServer(accountData) 
     });
 };
 
+var loadFriendListFromServer = function loadFriendListFromServer(csrf) {
+    sendAjax('GET', '/getFriendsList', $("#friendSearchForm").serialize(), function (data) {
+        ReactDOM.render(React.createElement(FriendList, { csrf: csrf, friends: data.friends }), document.querySelector("#friendList"));
+    });
+};
+
 var setup = function setup(csrf) {
     ReactDOM.render(React.createElement(FriendSearchForm, { csrf: csrf }), document.querySelector("#friendSearch"));
 
+    ReactDOM.render(React.createElement(AddFriendForm, { csrf: csrf }), document.querySelector("#addFriends"));
+
+    ReactDOM.render(React.createElement(FriendList, { csrf: csrf, friends: [] }), document.querySelector("#friendList"));
+
     ReactDOM.render(React.createElement(TaskList, { tasks: [] }), document.querySelector("#tasks"));
+
+    loadFriendListFromServer(csrf);
 };
 
 var getToken = function getToken() {

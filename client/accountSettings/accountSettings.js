@@ -19,30 +19,9 @@ const handlePremiumUser = (e) => {
     e.preventDefault();
     
     $("#domoMessage").animate({width: 'hide'}, 350);
-    
-    if ($("#email").val() == '') {
-        handleError("Email required to be premium user!");
-        return false;
-    }
     sendAjax('POST', $("#premiumUserForm").attr("action"), $("#premiumUserForm").serialize(), redirect);
     return false;
 };
-
-//Handles requests for setting an account to premium.
-//Requires an email for saving to the database entry.
-const handleEmail = (e) => {
-    e.preventDefault();
-    
-    $("#domoMessage").animate({width: 'hide'}, 350);
-    
-    if ($("#emailRecipient").val() == '') {
-        handleError("Specify email address to send mail to!");
-        return false;
-    }
-    sendAjax('POST', $("#emailForm").attr("action"), $("#emailForm").serialize(), redirect);
-    return false;
-};
-
 
 //Form for password changing.
 //Takes in username, old password, and 2 instances of new password.
@@ -69,7 +48,6 @@ const PremiumUserWindow = (props) => {
         <form id="premiumUserForm" name="premiumUserForm" onSubmit={handlePremiumUser} action="/premium" method="POST" className="premiumUserForm">
             <h3>Become a premium user?</h3>
             <p>Pay a small fee of $2 per month for additional features!</p>
-            <input id="email" type="text" name="email" placeholder="Email"/><br/><br/>
             <input type="hidden" name="_csrf" value={props.csrf}/>
             <input className="premiumUserSubmit" type="submit" value="Become premium"/>
             <hr/>
@@ -77,17 +55,6 @@ const PremiumUserWindow = (props) => {
     );
 };
 
-const EmailWindow = (props) => {
-    return (
-        <form id="emailForm" name="emailForm" onSubmit={handleEmail} action="/sendEmail" method="POST" className="emailForm">
-            <h3>Send Email?</h3>
-            <input id="emailRecipient" type="text" name="emailRecipient" placeholder="Email"/><br/><br/>
-            <input type="hidden" name="_csrf" value={props.csrf}/>
-            <input className="emailSubmit" type="submit" value="Send"/>
-            <hr/>
-        </form>
-    );
-};
 
 const setup = (csrf) => {
     ReactDOM.render(
@@ -96,10 +63,6 @@ const setup = (csrf) => {
     
     ReactDOM.render(
         <PasswordChangeWindow csrf={csrf} />, document.querySelector("#passwordChange")
-    );
-    
-    ReactDOM.render(
-        <EmailWindow csrf={csrf} />, document.querySelector("#sendEmail")
     );
 };
 

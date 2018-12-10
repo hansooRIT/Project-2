@@ -52,10 +52,11 @@ const signup = (request, response) => {
   const res = response;
 
   req.body.username = `${req.body.username}`;
+  req.body.email = `${req.body.email}`;
   req.body.pass = `${req.body.pass}`;
   req.body.pass2 = `${req.body.pass2}`;
 
-  if (!req.body.username || !req.body.pass || !req.body.pass2) {
+  if (!req.body.username || !req.body.email || !req.body.pass || !req.body.pass2) {
     return res.status(400).json({ error: 'RAWR! All fields are required!' });
   }
 
@@ -66,6 +67,7 @@ const signup = (request, response) => {
   return Account.AccountModel.generateHash(req.body.pass, (salt, hash) => {
     const accountData = {
       username: req.body.username,
+      email: req.body.email,
       salt,
       password: hash,
     };
@@ -142,24 +144,53 @@ const friendSearch = (request, response) => {
   });
 };
 
+const addFriend = (request, response) => {
+  const req = request;
+  const res = response;
+
+  req.body.addFriendName = `${req.body.addFriendName}`;
+
+  if (!req.body.addFriendName) {
+    return res.status(400).json({ error: 'RAWR! Enter a friend account name!' });
+  }
+
+  console.log('attempting to add to friends list');
+
+  return Account.AccountModel.addFriend(req.session.account._id,
+                                        req.body.addFriendName, (err, doc) => {
+                                          if (err || !doc) {
+                                            return res.status(401).json(
+                                                { error: 'Something went wrong!' });
+                                          }
+                                          return res.json({ redirect: '/friendTasks' });
+                                        });
+};
+
 // Method to set an account to premium and adds an email to their account.
 const setPremium = (request, response) => {
   const req = request;
   const res = response;
 
-  req.body.email = `${req.body.email}`;
-
-  if (!req.body.email) {
-    return res.status(400).json({ error: 'RAWR! Enter an email to link to a premium account!' });
-  }
-
-  return Account.AccountModel.setPremium(req.session.account._id, req.body.email, (err, doc) => {
+  return Account.AccountModel.setPremium(req.session.account._id,(err, doc) => {
     if (err || !doc) {
       return res.status(401).json({ error: 'Something went wrong!' });
     }
     return res.json({ redirect: '/accountSettings' });
   });
 };
+
+// Method to get an account's friends list.
+const getFriendsList = (request, response) => {
+  const req = request;
+  const res = response;
+
+  return Account.AccountModel.findByID(req.session.account._id, (err, doc) => {
+    if (err || !doc) {
+      return res.status(401).json({ error: 'Something went wrong!' });
+    }
+    return res.json({ friends: doc.friendsList });
+  });
+}
 
 const getToken = (request, response) => {
   const req = request;
@@ -172,53 +203,6 @@ const getToken = (request, response) => {
   res.json(csrfJSON);
 };
 
-// Method to send another user an email. Will be updated later.
-const sendEmail = (request, response) => {
-  const req = request;
-  const res = response;
-
-  // Set initial parameters for the transport.
-  // Specify host, and the credentials of the address that will be
-  // sending all of the emails.
-  const transport = {
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    auth: {
-      user: emailCredentials.user,
-      pass: emailCredentials.password,
-    },
-  };
-
-  const transporter = nodeMailer.createTransport(transport);
-
-  // Verify that we were able to create the transporter.
-  transporter.verify((err) => {
-    if (err) {
-      console.log('Something is wrong with the email transporter');
-      console.log(err);
-      return err;
-    }
-    console.log('Server is ready to send emails');
-    return null;
-  });
-
-  // Construct the email based on the request data.
-  const mail = {
-    from: emailCredentials.user,
-    to: req.body.emailRecipient,
-    subject: 'Nodemailer Test',
-    text: 'This is a test to see if nodemailer is working',
-  };
-
-  // Then send it.
-  return transporter.sendMail(mail, (err) => {
-    if (err) {
-      return res.status(401).json({ error: 'Something went wrong!' });
-    }
-    return res.json({ redirect: '/accountSettings' });
-  });
-};
-
 module.exports.loginPage = loginPage;
 module.exports.login = login;
 module.exports.logout = logout;
@@ -229,5 +213,6 @@ module.exports.accountSettingsPage = accountSettingsPage;
 module.exports.setPremium = setPremium;
 module.exports.friendTasksPage = friendTasksPage;
 module.exports.friendSearch = friendSearch;
-module.exports.sendEmail = sendEmail;
+module.exports.addFriend = addFriend;
+module.exports.getFriendsList = getFriendsList;
 

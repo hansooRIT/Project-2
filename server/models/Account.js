@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const nodeMailer = require('nodemailer');
+const emailCredentials = require('../config/config.js');
 
 mongoose.Promise = global.Promise;
 
@@ -9,6 +11,29 @@ const saltLength = 64;
 const keyLength = 64;
 
 const convertID = mongoose.Types.ObjectId;
+
+const FriendListSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    trim: true,
+    match: /^[A-Za-z0-9_\-.]{1,16}$/,
+  },
+
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+
+  isPremium: {
+    type: Boolean,
+    default: false,
+  },
+},
+{
+    usePushEach: true
+});
 
 const AccountSchema = new mongoose.Schema({
   username: {
@@ -34,13 +59,22 @@ const AccountSchema = new mongoose.Schema({
 
   email: {
     type: String,
+    required: true,
+    trim: true,
+    unique: true,
   },
+
+  friendsList: [FriendListSchema],
 
   createdDate: {
     type: Date,
     default: Date.now,
   },
-});
+},
+{
+    usePushEach: true
+}
+                                         );
 
 AccountSchema.statics.toAPI = doc => ({
   // _id is built into your mongo document and is guaranteed to be unique
@@ -86,23 +120,23 @@ AccountSchema.statics.generateHash = (password, callback) => {
 };
 
 AccountSchema.statics.authenticate = (username, password, callback) =>
-AccountModel.findByUsername(username, (err, doc) => {
-  if (err) {
-    return callback(err);
-  }
+    AccountModel.findByUsername(username, (err, doc) => {
+      if (err) {
+        return callback(err);
+      }
 
-  if (!doc) {
-    return callback();
-  }
+      if (!doc) {
+        return callback();
+      }
 
-  return validatePassword(doc, password, (result) => {
-    if (result === true) {
-      return callback(null, doc);
-    }
+      return validatePassword(doc, password, (result) => {
+        if (result === true) {
+          return callback(null, doc);
+        }
 
-    return callback();
-  });
-});
+        return callback();
+      });
+    });
 
 // Change passwords method.
 // Find the account, then validate that they entered
@@ -139,7 +173,7 @@ AccountSchema.statics.changePassword = (username, oldPass, newPass, callback) =>
 
 // Method to set an email and premium status to an account.
 // Finds the account by id, then adds the appropriate fields.
-AccountSchema.statics.setPremium = (id, email, callback) =>
+AccountSchema.statics.setPremium = (id, callback) =>
     AccountModel.findByID(id, (err, doc) => {
       if (err) {
         return callback(err);
@@ -150,7 +184,6 @@ AccountSchema.statics.setPremium = (id, email, callback) =>
       }
 
       doc.set({
-        email,
         isPremium: true,
       });
       return doc.save((error, document) => {
@@ -160,6 +193,76 @@ AccountSchema.statics.setPremium = (id, email, callback) =>
         return callback(null, document);
       });
     });
+
+AccountSchema.statics.addFriend = (userID, friendName, callback) => {
+  AccountModel.findByUsername(friendName, (err, doc) => {
+    if (err) {
+      return callback(err);
+    }
+
+    if (!doc) {
+      return callback();
+    }
+    return AccountModel.findByID(userID, (error, document) => {
+      if (error) {
+        return callback(error);
+      }
+
+      if (!document) {
+        return callback();
+      }
+
+      document.friendsList.push({
+        username: doc.username,
+        email: doc.email,
+        isPremium: doc.isPremium,
+      });
+
+    const transport = {
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      auth: {
+        user: emailCredentials.user,
+        pass: emailCredentials.password,
+      },
+    };
+
+    const transporter = nodeMailer.createTransport(transport);
+
+    // Verify that we were able to create the transporter.
+    transporter.verify((emailErr) => {
+      if (emailErr) {
+        console.dir('Something is wrong with the email transporter');
+        return emailErr;
+      }
+      return null;
+    });
+
+    // Construct the email based on the request data.
+    const mail = {
+      from: emailCredentials.user,
+      to: doc.email,
+      subject: 'Task Manager - Someone added you as a friend!',
+      text: `${document.username} has added you as a friend on Task Manager!`,
+    };
+
+    // Then send it.
+    transporter.sendMail(mail, (emailErr) => {
+      if (emailErr) {
+        return emailErr;
+      }
+      return null;
+    });
+        
+     return document.save((docError, newDoc) => {
+        if (docError) {
+          return callback(docError);
+        }
+        return callback(null, newDoc);
+      });
+    });
+  });
+};
 
 AccountModel = mongoose.model('Account', AccountSchema);
 

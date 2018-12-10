@@ -22,7 +22,7 @@ var handleSignup = function handleSignup(e) {
 
     $("#domoMessage").animate({ width: 'hide' }, 350);
 
-    if ($("#user").val() == '' || $("#pass").val() == '' || $("#pass2").val() == '') {
+    if ($("#user").val() == '' || $("#email").val() == '' || $("#pass").val() == '' || $("#pass2").val() == '') {
         handleError("RAWR! All fields are required");
         return false;
     }
@@ -63,6 +63,12 @@ var SignupWindow = function SignupWindow(props) {
             "Username: "
         ),
         React.createElement("input", { id: "user", type: "text", name: "username", placeholder: "username" }),
+        React.createElement(
+            "label",
+            { htmlFor: "email" },
+            "Email: "
+        ),
+        React.createElement("input", { id: "email", type: "text", name: "email", placeholder: "email" }),
         React.createElement(
             "label",
             { htmlFor: "pass" },
